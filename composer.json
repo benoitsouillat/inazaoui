@@ -71,10 +71,21 @@
         "symfony/polyfill-php72": "*"
     },
     "scripts": {
+        "db-test": [
+            "symfony console doctrine:database:drop -f --if-exists --env=test",
+            "symfony console doctrine:database:create --env=test",
+            "symfony console doctrine:migrations:migrate -n --env=test"
+        ],
+        "test": [
+            "composer db-test",
+            "symfony php bin/phpunit"
+        ],
         "auto-scripts": {
             "cache:clear": "symfony-cmd",
-            "assets:install %PUBLIC_DIR%": "symfony-cmd"
+            "assets:install %PUBLIC_DIR%": "symfony-cmd",
+            "importmap:install": "symfony-cmd"
         },
+        "phpstan": "vendor/bin/phpstan --memory-limit=-1",
         "post-install-cmd": [
             "@auto-scripts"
         ],
