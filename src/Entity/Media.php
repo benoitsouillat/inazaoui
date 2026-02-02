@@ -4,29 +4,35 @@ namespace App\Entity;
 
 use App\Repository\MediaRepository;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Gedmo\Timestampable\Traits\TimestampableEntity;
+use Symfony\Component\HttpFoundation\File\File;
+use Vich\UploaderBundle\Mapping\Attribute as Vich;
 
+#[Vich\Uploadable]
 #[ORM\Entity(repositoryClass: MediaRepository::class)]
 class Media
 {
+    use TimestampableEntity;
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: "medias", fetch: "EAGER")]
+    #[ORM\ManyToOne(targetEntity: User::class, fetch: "EAGER", inversedBy: "medias")]
     private ?User $user = null;
 
     #[ORM\ManyToOne(targetEntity: Album::class, fetch: "EAGER")]
     private ?Album $album = null;
 
-    #[ORM\Column]
-    private string $path;
+    #[Vich\UploadableField(mapping: 'medias', fileNameProperty: 'path')]
+    private ?File $file = null;
+
+    #[ORM\Column(type: 'string', nullable: true)]
+    private ?string $path = null;
 
     #[ORM\Column]
     private string $title;
-
-    private ?UploadedFile $file = null;
 
     public function getId(): ?int
     {
@@ -44,7 +50,7 @@ class Media
         return $this;
     }
 
-    public function getPath(): string
+    public function getPath(): ?string
     {
         return $this->path;
     }
@@ -66,14 +72,19 @@ class Media
         return $this;
     }
 
-    public function getFile(): ?UploadedFile
+    public function getFile(): ?File
     {
         return $this->file;
     }
 
-    public function setFile(?UploadedFile $file): static
+    public function setFile(?File $file = null): static
     {
         $this->file = $file;
+
+        if (null !== $file) {
+            $this->updatedAt = new \DateTimeImmutable();
+        }
+
         return $this;
     }
 

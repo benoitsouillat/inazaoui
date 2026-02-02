@@ -48,8 +48,10 @@ class MediaController extends AbstractController
             if (!$this->isGranted('ROLE_ADMIN')) {
                 $media->setUser($this->getUser());
             }
-            $media->setPath('uploads/' . md5(uniqid()) . '.' . $media->getFile()->guessExtension());
-            $media->getFile()->move('uploads/', $media->getPath());
+            $media->setCreatedAt(new \DateTime());
+
+            // il manque le /uploads/ dans le path
+
             $registry->getManager()->persist($media);
             $registry->getManager()->flush();
 
@@ -63,9 +65,10 @@ class MediaController extends AbstractController
     public function delete(int $id, ManagerRegistry $registry)
     {
         $media = $registry->getRepository(Media::class)->find($id);
+        $path = $media->getPath();
         $registry->getManager()->remove($media);
         $registry->getManager()->flush();
-        unlink($media->getPath());
+        unlink($path);
 
         return $this->redirectToRoute('admin_media_index');
     }
