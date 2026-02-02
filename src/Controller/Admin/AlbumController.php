@@ -7,6 +7,7 @@ use App\Form\AlbumType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
 class AlbumController extends AbstractController
@@ -17,7 +18,7 @@ class AlbumController extends AbstractController
     {}
 
     #[Route('/admin/album', name: 'admin_album_index', methods: Request::METHOD_GET)]
-    public function index()
+    public function index(): Response
     {
         $albums = $this->manager->getRepository(Album::class)->findAll();
 
@@ -25,7 +26,7 @@ class AlbumController extends AbstractController
     }
 
     #[Route('/admin/album/add', name: 'admin_album_add', methods: [Request::METHOD_GET, Request::METHOD_POST])]
-    public function add(Request $request)
+    public function add(Request $request): Response
     {
         $album = new Album();
         $form = $this->createForm(AlbumType::class, $album);
@@ -41,8 +42,12 @@ class AlbumController extends AbstractController
         return $this->render('admin/album/add.html.twig', ['form' => $form->createView()]);
     }
 
-    #[Route('/admin/album/update/{id}', name: 'admin_album_update', methods: [Request::METHOD_GET, Request::METHOD_POST])]
-    public function update(Request $request, Album $album)
+    #[Route(
+        '/admin/album/update/{id}',
+        name: 'admin_album_update',
+        methods: [Request::METHOD_GET, Request::METHOD_POST]
+    )]
+    public function update(Request $request, Album $album): Response
     {
         $form = $this->createForm(AlbumType::class, $album);
         $form->handleRequest($request);
