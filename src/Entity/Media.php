@@ -55,7 +55,7 @@ class Media
         return $this->path;
     }
 
-    public function setPath(string $path): static
+    public function setPath(?string $path = null): static
     {
         $this->path = $path;
         return $this;

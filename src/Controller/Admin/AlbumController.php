@@ -3,34 +3,37 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Album;
-use App\Entity\Media;
 use App\Form\AlbumType;
-use App\Form\MediaType;
-use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
 
 class AlbumController extends AbstractController
 {
-    #[Route('/admin/album', name: 'admin_album_index')]
-    public function index(ManagerRegistry $registry)
+    public function __construct(
+        private readonly EntityManagerInterface $manager
+    )
+    {}
+
+    #[Route('/admin/album', name: 'admin_album_index', methods: Request::METHOD_GET)]
+    public function index()
     {
-        $albums = $registry->getRepository(Album::class)->findAll();
+        $albums = $this->manager->getRepository(Album::class)->findAll();
 
         return $this->render('admin/album/index.html.twig', ['albums' => $albums]);
     }
 
-    #[Route('/admin/album/add', name: 'admin_album_add')]
-    public function add(Request $request, ManagerRegistry $registry)
+    #[Route('/admin/album/add', name: 'admin_album_add', methods: [Request::METHOD_GET, Request::METHOD_POST])]
+    public function add(Request $request)
     {
         $album = new Album();
         $form = $this->createForm(AlbumType::class, $album);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $registry->getManager()->persist($album);
-            $registry->getManager()->flush();
+            $this->manager->persist($album);
+            $this->manager->flush();
 
             return $this->redirectToRoute('admin_album_index');
         }
@@ -38,15 +41,14 @@ class AlbumController extends AbstractController
         return $this->render('admin/album/add.html.twig', ['form' => $form->createView()]);
     }
 
-    #[Route('/admin/album/update/{id}', name: 'admin_album_update')]
-    public function update(Request $request, int $id, ManagerRegistry $registry)
+    #[Route('/admin/album/update/{id}', name: 'admin_album_update', methods: [Request::METHOD_GET, Request::METHOD_POST])]
+    public function update(Request $request, Album $album)
     {
-        $album = $registry->getRepository(Album::class)->find($id);
         $form = $this->createForm(AlbumType::class, $album);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $registry->getManager()->flush();
+            $this->manager->flush();
 
             return $this->redirectToRoute('admin_album_index');
         }
@@ -54,12 +56,11 @@ class AlbumController extends AbstractController
         return $this->render('admin/album/update.html.twig', ['form' => $form->createView()]);
     }
 
-    #[Route('/admin/album/delete/{id}', name: 'admin_album_delete')]
-    public function delete(int $id, ManagerRegistry $registry)
+    #[Route('/admin/album/delete/{id}', name: 'admin_album_delete', methods: Request::METHOD_GET)]
+    public function delete(Album $album)
     {
-        $media = $registry->getRepository(Album::class)->find($id);
-        $registry->getManager()->remove($media);
-        $registry->getManager()->flush();
+        $this->manager->remove($album);
+        $this->manager->flush();
 
         return $this->redirectToRoute('admin_album_index');
     }
