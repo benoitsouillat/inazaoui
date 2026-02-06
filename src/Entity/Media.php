@@ -7,6 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Timestampable\Traits\TimestampableEntity;
 use Symfony\Component\HttpFoundation\File\File;
 use Vich\UploaderBundle\Mapping\Attribute as Vich;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[Vich\Uploadable]
 #[ORM\Entity(repositoryClass: MediaRepository::class)]
@@ -25,6 +26,11 @@ class Media
     #[ORM\ManyToOne(targetEntity: Album::class, fetch: "EAGER")]
     private ?Album $album = null;
 
+    #[Assert\File(
+        maxSize: '2M',
+        mimeTypes: ['image/jpeg', 'image/png', 'image/gif'],
+        mimeTypesMessage: 'Merci d\'utiliser une image (JPEG, PNG, GIF) n\'excédant pas 2MB.'
+    )]
     #[Vich\UploadableField(mapping: 'medias', fileNameProperty: 'path')]
     private ?File $file = null;
 
