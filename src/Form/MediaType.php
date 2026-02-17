@@ -4,7 +4,7 @@ namespace App\Form;
 
 use App\Entity\Album;
 use App\Entity\Media;
-use App\Entity\User;
+use App\Entity\OldUser;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
@@ -31,7 +31,7 @@ class MediaType extends AbstractType
                 ->add('user', EntityType::class, [
                     'label' => 'Utilisateur',
                     'required' => false,
-                    'class' => User::class,
+                    'class' => OldUser::class,
                     'choice_label' => 'name',
                 ])
                 ->add('album', EntityType::class, [
