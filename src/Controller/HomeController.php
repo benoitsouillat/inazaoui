@@ -4,7 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Album;
 use App\Entity\Media;
-use App\Entity\OldUser;
+use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -27,7 +27,7 @@ class HomeController extends AbstractController
     #[Route("/guests", name: "guests", methods: Request::METHOD_GET)]
     public function guests(): Response
     {
-        $guests = $this->manager->getRepository(OldUser::class)->findBy(['admin' => false]);
+        $guests = $this->manager->getRepository(User::class)->findBy(['admin' => false]);
 
         return $this->render('front/guests.html.twig', [
             'guests' => $guests
@@ -35,7 +35,7 @@ class HomeController extends AbstractController
     }
 
     #[Route("/guest/{id}", name: "guest", requirements: ['id' => '\d+'], methods: Request::METHOD_GET)]
-    public function guest(OldUser $guest): Response
+    public function guest(User $guest): Response
     {
         return $this->render('front/guest.html.twig', [
             'guest' => $guest
@@ -46,7 +46,7 @@ class HomeController extends AbstractController
     public function portfolio(?Album $album = null): Response
     {
         $albums = $this->manager->getRepository(Album::class)->findAll();
-        $user = $this->manager->getRepository(OldUser::class)->findOneByAdmin(true);
+        $user = $this->manager->getRepository(User::class)->findOneByAdmin(true);
 
         $medias = $album
             ? $this->manager->getRepository(Media::class)->findByAlbum($album)

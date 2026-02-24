@@ -21,11 +21,13 @@ security:
             form_login:
                 login_path: admin_login
                 check_path: admin_login
+            logout:
+                path: /logout
     role_hierarchy:
         ROLE_ADMIN: ROLE_USER
 
     access_control:
-        - { path: ^/admin, roles: ROLE_USER }
+        - { path: ^/admin, roles: ROLE_ADMIN }
 
 when@test:
     security:
