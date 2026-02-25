@@ -16,7 +16,8 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 final class GuestController extends AbstractController
 {
     public function __construct(
-        private readonly EntityManagerInterface $manager
+        private readonly EntityManagerInterface $manager,
+        private readonly GuestService $service
     )
     {}
 
@@ -29,22 +30,45 @@ final class GuestController extends AbstractController
     }
 
     #[Route('/admin/guest/add', name: 'admin_guest_add', methods: [Request::METHOD_GET, Request::METHOD_POST])]
-    public function add(Request $request, GuestService $guestService): Response
+    public function add(Request $request): Response
     {
         $form = $this->createForm(GuestType::class);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $guest = $guestService->addUser($form->getData());
-
-            //Envoyer email de création de mot de passe
+            $guest = $this->service->addUser($form->getData());
 
             $this->addFlash('success', 'L\'invité a été ajouté avec succès.');
-
             return $this->redirectToRoute('admin_guest_index');
         }
 
         return $this->render('admin/guest/add.html.twig', [
             'form' => $form->createView(),
         ]);
+    }
+
+    #[Route('/admin/guest/{id}/edit', name: 'admin_guest_edit', methods: [Request::METHOD_GET, Request::METHOD_POST])]
+    public function edit(Request $request, User $guest): Response
+    {
+        $form = $this->createForm(GuestType::class, $guest);
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $guest = $this->service->editUser($form->getData());
+
+            $this->addFlash('success', 'L\'invité a été modifié avec succès.');
+            return $this->redirectToRoute('admin_guest_index');
+        }
+
+        return $this->render('admin/guest/edit.html.twig', [
+            'guest' => $guest,
+        ]);
+    }
+
+    #[Route('/admin/guest/{id}/delete', name: 'admin_guest_delete', methods: Request::METHOD_GET)]
+    public function delete(User $guest): Response
+    {
+            $this->manager->remove($guest);
+            $this->manager->flush();
+
+        return $this->redirectToRoute('admin_guest_index');
     }
 }

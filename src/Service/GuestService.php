@@ -20,9 +20,9 @@ class GuestService
     )
     {}
 
-    public function getUsers(): array
+    public function getGuests(): array
     {
-        return $this->manager->getRepository(User::class)->findAll();
+        return $this->manager->getRepository(User::class)->findBy();
     }
 
     public function addUser(User $guest): ?User
@@ -37,6 +37,18 @@ class GuestService
             $event = new GuestEvent($guest);
             $this->dispatcher->dispatch($event, GuestEvent::GUEST_CREATED);
 
+            $this->manager->persist($guest);
+            $this->manager->flush();
+            return $guest;
+        }
+        catch (\Exception $exception) {
+            return null;
+        }
+    }
+
+    public function editUser(User $guest): ?User
+    {
+        try {
             $this->manager->persist($guest);
             $this->manager->flush();
             return $guest;

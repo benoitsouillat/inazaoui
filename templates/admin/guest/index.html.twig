@@ -5,5 +5,30 @@
     <h1>Invités</h1>
     <a href="{{ path('admin_guest_add') }}" class="btn btn-primary">Ajouter</a>
 </div>
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Nom & Prénom</th>
+            <th>Nom d'utilisateur</th>
+            <th>Email</th>
+            <th>Description</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for guest in guests %}
+            <tr>
+                <td>{{ guest.name }}</td>
+                <td>{{ guest.username }}</td>
+                <td>{{ guest.email }}</td>
+                <td>{{ guest.description }}</td>
+                <td>
+                    <a href="{{ path('admin_guest_update', {id: guest.id}) }}" class="btn btn-warning">Modifier</a>
+                    <a href="{{ path('admin_guest_delete', {id: guest.id}) }}" class="btn btn-danger">Supprimer</a>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
 
 {% endblock %}
