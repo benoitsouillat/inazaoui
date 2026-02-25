@@ -10,6 +10,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 final class GuestEvent extends Event
 {
     public const GUEST_CREATED = 'guest.created';
+    public const GUEST_EDITED = 'guest.edited';
 
     public function __construct(
         private readonly User $guest

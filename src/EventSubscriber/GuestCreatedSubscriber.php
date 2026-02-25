@@ -18,13 +18,21 @@ class GuestCreatedSubscriber implements EventSubscriberInterface
     {
         return [
             'guest.created' => 'onGuestCreated',
+            'guest.edited' => 'onGuestEdited',
         ];
     }
 
     public function onGuestCreated($event): void
     {
+        // Vider le cache des invités
+
         $guest = $event->getGuest();
         // Envoyer un email de bienvenue à l'invité
         $this->mailerService->sendWelcomeEmail($guest);
+    }
+
+    public function onGuestEdited($event): void
+    {
+        // Vider le cache des invités
     }
 }

@@ -22,7 +22,11 @@ class GuestService
 
     public function getGuests(): array
     {
-        return $this->manager->getRepository(User::class)->findBy();
+        /*return $this->manager->getRepository(User::class)->findAll();*/
+
+
+        // Mettre en cache la liste, elle sera vidé si un invité est créé ou modifié ou supprimé
+        return $this->manager->getRepository(User::class)->findBy(['roles' => ['ROLE_USER']], ['name' => 'ASC']);
     }
 
     public function addUser(User $guest): ?User
@@ -48,6 +52,7 @@ class GuestService
 
     public function editUser(User $guest): ?User
     {
+        $this->dispatcher->dispatch(new GuestEvent($guest), GuestEvent::GUEST_EDITED);
         try {
             $this->manager->persist($guest);
             $this->manager->flush();

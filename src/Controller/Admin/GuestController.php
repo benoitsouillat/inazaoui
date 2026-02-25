@@ -3,10 +3,12 @@
 namespace App\Controller\Admin;
 
 use App\Entity\User;
+use App\Event\GuestEvent;
 use App\Form\GuestType;
 use App\Service\GuestService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -24,7 +26,7 @@ final class GuestController extends AbstractController
     #[Route('/admin/guest', name: 'admin_guest_index', methods: Request::METHOD_GET)]
     public function index(): Response
     {
-        $guests = $this->manager->getRepository(User::class)->findAll();
+        $guests = $this->service->getGuests();
 
         return $this->render('admin/guest/index.html.twig', ['guests' => $guests]);
     }
@@ -46,7 +48,7 @@ final class GuestController extends AbstractController
         ]);
     }
 
-    #[Route('/admin/guest/{id}/edit', name: 'admin_guest_edit', methods: [Request::METHOD_GET, Request::METHOD_POST])]
+    #[Route('/admin/guest/{id}/edit', name: 'admin_guest_update', methods: [Request::METHOD_GET, Request::METHOD_POST])]
     public function edit(Request $request, User $guest): Response
     {
         $form = $this->createForm(GuestType::class, $guest);
@@ -58,14 +60,15 @@ final class GuestController extends AbstractController
             return $this->redirectToRoute('admin_guest_index');
         }
 
-        return $this->render('admin/guest/edit.html.twig', [
+        return $this->render('admin/guest/update.html.twig', [
             'guest' => $guest,
         ]);
     }
 
     #[Route('/admin/guest/{id}/delete', name: 'admin_guest_delete', methods: Request::METHOD_GET)]
-    public function delete(User $guest): Response
+    public function delete(User $guest, EventDispatcherInterface $dispatcher): Response
     {
+            $dispatcher->dispatch(new GuestEvent($guest), GuestEvent::GUEST_EDITED);
             $this->manager->remove($guest);
             $this->manager->flush();
 
