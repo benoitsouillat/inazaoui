@@ -25,9 +25,13 @@ final class Version20260217115950 extends AbstractMigration
         $this->addSql('ALTER TABLE "user" ADD password VARCHAR(255) DEFAULT NULL');
 
         $this->addSql('UPDATE "user" SET username = email');
-        $this->addSql('UPDATE "user" SET roles = \'["ROLE_ADMIN"]\' WHERE admin = true');
+        $this->addSql('UPDATE "user" SET roles = \'["ROLE_USER", "ROLE_ADMIN"]\' WHERE admin = true');
         $this->addSql('UPDATE "user" SET roles = \'["ROLE_USER"]\' WHERE admin = false');
         $this->addSql('UPDATE "user" SET password = \'LOCKED_ACCOUNT_CHANGE_REQUIRED\'');
+
+        // Ajout du mot de passe administrateur => Le mot de passe doit être changé en production
+        $this->addSql('UPDATE "user" SET username = \'ina\' WHERE admin = true AND id = 1');
+        $this->addSql('UPDATE "user" SET password = \'$2y$13$bO9QSldvhC.4HkoM76u2AekkacExxSUuB1sCmrbzAKfGBFVFa9bDm\' WHERE admin = true');
 
         $this->addSql('ALTER TABLE "user" ALTER COLUMN username SET NOT NULL');
         $this->addSql('ALTER TABLE "user" ALTER COLUMN roles SET NOT NULL');
