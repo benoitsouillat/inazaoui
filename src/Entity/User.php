@@ -46,7 +46,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private Collection $medias;
 
     #[ORM\Column]
-    private ?bool $active = null;
+    private ?bool $active = true;
 
     public function getId(): ?int
     {
