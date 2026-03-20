@@ -15,6 +15,12 @@ services:
     container_name: adminer_ina
     ports:
       - "8080:8080"
+  mailhog:
+    image: mailhog/mailhog
+    container_name: mailhog_ina
+    ports:
+      - "1025:1025"
+      - "8025:8025"
 
 volumes:
   db_data:

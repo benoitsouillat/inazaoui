@@ -26,7 +26,7 @@ final class GuestController extends AbstractController
     #[Route('/admin/guest', name: 'admin_guest_index', methods: Request::METHOD_GET)]
     public function index(): Response
     {
-        $guests = $this->service->getGuests();
+        $guests = $this->service->getGuests('ROLE_USER');
 
         return $this->render('admin/guest/index.html.twig', ['guests' => $guests]);
     }

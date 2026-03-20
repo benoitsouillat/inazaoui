@@ -64,6 +64,12 @@ final class Version20260130151046 extends AbstractMigration
 
         $sqlContent = file_get_contents($filePath);
 
+
+        // Retirer le chemin Uploads des médias qui sera géré par Vich_Uploader
+        if ($filePath == __DIR__ . '/sql/' . "media.sql") {
+            $sqlContent = str_replace('uploads/', '', $sqlContent);
+        }
+
         // On sépare le fichier en plusieurs requêtes en utilisant le point-virgule comme délimiteur
         $queries = explode(';', $sqlContent);
 

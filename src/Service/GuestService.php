@@ -8,25 +8,44 @@ use App\Entity\User;
 use App\Event\GuestEvent;
 use Doctrine\ORM\EntityManagerInterface;
 
+use Doctrine\ORM\Query\ResultSetMappingBuilder;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Contracts\Cache\ItemInterface;
+use Symfony\Contracts\Cache\TagAwareCacheInterface;
 
 class GuestService
 {
     public function __construct(
         private readonly EntityManagerInterface $manager,
         private readonly UserPasswordHasherInterface $passwordHasher,
-        private readonly EventDispatcherInterface $dispatcher
+        private readonly EventDispatcherInterface $dispatcher,
+        private readonly TagAwareCacheInterface $cache
     )
     {}
 
-    public function getGuests(): array
+    public function getGuests(string $role): array
     {
-        /*return $this->manager->getRepository(User::class)->findAll();*/
+        $cacheKey = 'guests_list_' . $role;
 
+        return $this->cache->get($cacheKey, function (ItemInterface $item) use ($role) {
+        $rsm = new ResultSetMappingBuilder($this->manager);
+            $rsm->addRootEntityFromClassMetadata(User::class, 'u');
 
-        // Mettre en cache la liste, elle sera vidé si un invité est créé ou modifié ou supprimé
-        return $this->manager->getRepository(User::class)->findBy(['roles' => ['ROLE_USER']], ['name' => 'ASC']);
+            $sql = 'SELECT ' . $rsm->generateSelectClause() . '
+                        FROM "user" u
+                        WHERE u.roles::text LIKE :role
+                        AND u.roles::text NOT LIKE :admin
+                        ORDER BY u.name ASC';
+
+            $query = $this->manager->createNativeQuery($sql, $rsm);
+            $query->setParameter('role', '%' . $role . '%');
+            $query->setParameter('admin', '%ROLE_ADMIN%');
+
+            $item->tag('guests');
+
+            return $query->getResult();
+        });
     }
 
     public function addUser(User $guest): ?User
