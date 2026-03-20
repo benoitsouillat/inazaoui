@@ -59,14 +59,20 @@ final class GuestController extends AbstractController
         $form = $this->createForm(GuestType::class, $guest);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $guest = $this->service->editUser($form->getData());
+            try {
+                $this->service->editUser($form->getData());
+                $this->addFlash('success', 'L\'invité a été modifié avec succès.');
 
-            $this->addFlash('success', 'L\'invité a été modifié avec succès.');
-            return $this->redirectToRoute('admin_guest_index');
+                return $this->redirectToRoute('admin_guest_index');
+            }
+            catch (\Exception $e) {
+                $this->addFlash('danger', $e->getMessage());
+            }
         }
 
         return $this->render('admin/guest/update.html.twig', [
             'guest' => $guest,
+            'form' => $form->createView(),
         ]);
     }
 
@@ -76,6 +82,18 @@ final class GuestController extends AbstractController
             $dispatcher->dispatch(new GuestEvent($guest), GuestEvent::GUEST_EDITED);
             $this->manager->remove($guest);
             $this->manager->flush();
+
+        return $this->redirectToRoute('admin_guest_index');
+    }
+
+    #[Route('/admin/guest/{id}/toggle', name: 'admin_guest_toggle', methods: Request::METHOD_GET)]
+    public function toggle(User $guest, EventDispatcherInterface $dispatcher): Response
+    {
+        $guest->setActive(!$guest->isActive());
+        $dispatcher->dispatch(new GuestEvent($guest), GuestEvent::GUEST_EDITED);
+        $this->manager->persist($guest);
+        $this->manager->flush();
+        $this->addFlash('success', sprintf('Le compte de l\'invité a bien été %s.', $guest->isActive() ? 'activé' : 'désactivé'));
 
         return $this->redirectToRoute('admin_guest_index');
     }
