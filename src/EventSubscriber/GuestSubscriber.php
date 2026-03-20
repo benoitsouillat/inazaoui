@@ -33,7 +33,8 @@ class GuestSubscriber implements EventSubscriberInterface
     public function onGuestCreated(GuestEvent $event): void
     {
         $guest = $event->getGuest();
-        // Envoyer un email de bienvenue à l'invité
+
+        // Envoie un email de bienvenue à l'invité
         $this->mailerService->sendWelcomeEmail($guest);
     }
 

@@ -24,12 +24,19 @@ final class Version20260130151046 extends AbstractMigration
 
         $this->addSql('CREATE TABLE album (id SERIAL NOT NULL, name VARCHAR(255) NOT NULL, PRIMARY KEY(id))');
         $this->loadSqlFile($sqlDirectory . 'album.sql');
+        // Recalibrage de l'incrémentation de postgresSQL ALBUM
+        $this->addSql("SELECT setval(pg_get_serial_sequence('album', 'id'), coalesce(max(id),0) + 1, false) FROM album;");
 
         $this->addSql('CREATE TABLE "user" (id SERIAL NOT NULL, admin BOOLEAN NOT NULL, name VARCHAR(255) NOT NULL, description TEXT DEFAULT NULL, email VARCHAR(180) NOT NULL, PRIMARY KEY(id))');
         $this->loadSqlFile($sqlDirectory . 'user.sql');
+        // Recalibrage de l'incrémentation de postgresSQL USER
+        $this->addSql("SELECT setval(pg_get_serial_sequence('\"user\"', 'id'), coalesce(max(id),0) + 1, false) FROM \"user\";");
 
         $this->addSql('CREATE TABLE media (id SERIAL NOT NULL, user_id INT DEFAULT NULL, album_id INT DEFAULT NULL, path VARCHAR(255) NOT NULL, title VARCHAR(255) NOT NULL,  PRIMARY KEY(id))');
         $this->loadSqlFile($sqlDirectory . 'media.sql');
+
+        // Recalibrage de l'incrémentation de postgresSQL MEDIA
+        $this->addSql("SELECT setval(pg_get_serial_sequence('media', 'id'), coalesce(max(id),0) + 1, false) FROM media;");
 
         $this->addSql('ALTER TABLE media ADD created_at TIMESTAMP(0) WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL');
         $this->addSql('ALTER TABLE media ADD updated_at TIMESTAMP(0) WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL');

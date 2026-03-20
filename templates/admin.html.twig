@@ -28,6 +28,20 @@
                 </div>
             </nav>
             <main class="col-md-9 ms-sm-auto col-lg-10 p-4">
+                {% block message %}
+                    <div class="container">
+                        <div class="messages">
+                            {% for label, messages in app.flashes(['success', 'warning', 'danger']) %}
+                                {% for message in messages %}
+                                    <div class="alert alert-{{ label }}" role="alert">
+                                        {{ message }}
+                                    </div>
+                                {% endfor %}
+                            {% endfor %}
+                        </div>
+
+                    </div>
+                {% endblock %}
                 {% block admin %}{% endblock %}
             </main>
         </div>

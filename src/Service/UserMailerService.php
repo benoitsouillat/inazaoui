@@ -27,7 +27,7 @@ class UserMailerService
     public function sendWelcomeEmail(User $guest): void
     {
         $resetToken = $this->resetPasswordHelper->generateResetToken($guest);
-        $url = $this->urlGenerator->generate('reset_password', ['token' => $resetToken->getToken()], UrlGeneratorInterface::ABSOLUTE_URL);
+        $url = $this->urlGenerator->generate('app_reset_password', ['token' => $resetToken->getToken()], UrlGeneratorInterface::ABSOLUTE_URL);
 
         $email = (new TemplatedEmail())
             ->from($this->params->get('site_email'))

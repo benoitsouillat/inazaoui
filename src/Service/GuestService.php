@@ -48,37 +48,27 @@ class GuestService
         });
     }
 
-    public function addUser(User $guest): ?User
+    public function addUser(User $guest): User| \Exception
     {
-        try {
-            $guest->setRoles(['ROLE_USER']);
-            $plainPassword = bin2hex(random_bytes(16));
-            $hashedPassword = $this->passwordHasher->hashPassword($guest, $plainPassword);
+        $guest->setRoles(['ROLE_USER']);
+        $plainPassword = bin2hex(random_bytes(16));
+        $hashedPassword = $this->passwordHasher->hashPassword($guest, $plainPassword);
 
-            $guest->setPassword($hashedPassword);
+        $guest->setPassword($hashedPassword);
 
-            $event = new GuestEvent($guest);
-            $this->dispatcher->dispatch($event, GuestEvent::GUEST_CREATED);
+        $this->manager->persist($guest);
+        $this->manager->flush();
+        $this->dispatcher->dispatch(new GuestEvent($guest), GuestEvent::GUEST_CREATED);
 
-            $this->manager->persist($guest);
-            $this->manager->flush();
-            return $guest;
-        }
-        catch (\Exception $exception) {
-            return null;
-        }
+        return $guest;
     }
 
-    public function editUser(User $guest): ?User
+    public function editUser(User $guest): User| \Exception
     {
         $this->dispatcher->dispatch(new GuestEvent($guest), GuestEvent::GUEST_EDITED);
-        try {
-            $this->manager->persist($guest);
-            $this->manager->flush();
-            return $guest;
-        }
-        catch (\Exception $exception) {
-            return null;
-        }
+        $this->manager->persist($guest);
+        $this->manager->flush();
+
+        return $guest;
     }
 }

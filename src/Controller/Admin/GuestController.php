@@ -37,10 +37,15 @@ final class GuestController extends AbstractController
         $form = $this->createForm(GuestType::class);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $guest = $this->service->addUser($form->getData());
+            try {
+                $this->service->addUser($form->getData());
+                $this->addFlash('success', 'L\'invité a été ajouté avec succès.');
 
-            $this->addFlash('success', 'L\'invité a été ajouté avec succès.');
-            return $this->redirectToRoute('admin_guest_index');
+                return $this->redirectToRoute('admin_guest_index');
+            }
+            catch (\Exception $e) {
+                $this->addFlash('danger', $e->getMessage());
+            }
         }
 
         return $this->render('admin/guest/add.html.twig', [
