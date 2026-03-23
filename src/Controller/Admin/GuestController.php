@@ -79,9 +79,7 @@ final class GuestController extends AbstractController
     #[Route('/admin/guest/{id}/delete', name: 'admin_guest_delete', methods: Request::METHOD_GET)]
     public function delete(User $guest, EventDispatcherInterface $dispatcher): Response
     {
-            $dispatcher->dispatch(new GuestEvent($guest), GuestEvent::GUEST_EDITED);
-            $this->manager->remove($guest);
-            $this->manager->flush();
+        $dispatcher->dispatch(new GuestEvent($guest), GuestEvent::GUEST_DELETED);
 
         return $this->redirectToRoute('admin_guest_index');
     }

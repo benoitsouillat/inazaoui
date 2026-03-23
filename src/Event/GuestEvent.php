@@ -11,6 +11,7 @@ final class GuestEvent extends Event
 {
     public const GUEST_CREATED = 'guest.created';
     public const GUEST_EDITED = 'guest.edited';
+    public const GUEST_DELETED = 'guest.deleted';
 
     public function __construct(
         private readonly User $guest
