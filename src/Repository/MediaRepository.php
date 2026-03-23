@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Entity\Album;
 use App\Entity\Media;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -19,6 +20,28 @@ class MediaRepository extends ServiceEntityRepository
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Media::class);
+    }
+
+    public function findActiveByAlbum(Album $album)
+    {
+        return $this->createQueryBuilder('m')
+            ->andWhere('m.album = :album')
+            ->setParameter('album', $album)
+            ->join('m.user', 'u')
+            ->andWhere('u.active = true')
+            ->orderBy('m.createdAt', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function findAllActive()
+    {
+        return $this->createQueryBuilder('m')
+            ->join('m.user', 'u')
+            ->andWhere('u.active = true')
+            ->orderBy('m.createdAt', 'DESC')
+            ->getQuery()
+            ->getResult();
     }
 
 //    /**

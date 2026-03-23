@@ -24,6 +24,12 @@ class GuestService
     )
     {}
 
+    /**
+     * Get All Guest with this Role
+     * @param string $role
+     * @return array
+     * @throws \Psr\Cache\InvalidArgumentException
+     */
     public function getGuests(string $role): array
     {
         $cacheKey = 'guests_list_' . $role;
@@ -40,6 +46,34 @@ class GuestService
 
             $query = $this->manager->createNativeQuery($sql, $rsm);
             $query->setParameter('role', '%' . $role . '%');
+            $query->setParameter('admin', '%ROLE_ADMIN%');
+
+            $item->tag('guests');
+
+            return $query->getResult();
+        });
+    }
+
+    /**
+     * Get Active Guests where Not Admin
+     * @return array
+     * @throws \Psr\Cache\InvalidArgumentException
+     */
+    public function getActiveGuests(): array
+    {
+        $cacheKey = 'guests_active_list';
+
+        return $this->cache->get($cacheKey, function (ItemInterface $item) {
+            $rsm = new ResultSetMappingBuilder($this->manager);
+            $rsm->addRootEntityFromClassMetadata(User::class, 'u');
+
+            $sql = 'SELECT ' . $rsm->generateSelectClause() . '
+                        FROM "user" u
+                        WHERE u.active = true
+                        AND u.roles::text NOT LIKE :admin
+                        ORDER BY u.name ASC';
+
+            $query = $this->manager->createNativeQuery($sql, $rsm);
             $query->setParameter('admin', '%ROLE_ADMIN%');
 
             $item->tag('guests');
