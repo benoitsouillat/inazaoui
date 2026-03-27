@@ -80,6 +80,7 @@ final class GuestController extends AbstractController
     public function delete(User $guest, EventDispatcherInterface $dispatcher): Response
     {
         $dispatcher->dispatch(new GuestEvent($guest), GuestEvent::GUEST_DELETED);
+        $this->addFlash('success', 'Le compte de l\'invité a bien été supprimé.');
 
         return $this->redirectToRoute('admin_guest_index');
     }
