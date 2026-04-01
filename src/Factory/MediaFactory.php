@@ -33,6 +33,11 @@ final class MediaFactory extends PersistentObjectFactory
     #[\Override]
     protected function defaults(): array|callable
     {
+
+        // TODO
+        // Récupérer les albums - En choisir un
+        // Récupérer une image sur lorem picsum et la télécharger
+        // Associer l'image à l'album
         return [
             'createdAt' => self::faker()->dateTime(),
             'title' => self::faker()->text(),

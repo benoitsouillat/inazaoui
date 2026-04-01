@@ -3,6 +3,8 @@
 namespace App\Factory;
 
 use App\Entity\User;
+use App\Repository\UserRepository;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 
 /**
@@ -13,10 +15,12 @@ final class UserFactory extends PersistentObjectFactory
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#factories-as-services
      *
-     * @todo inject services if required
-     */
-    public function __construct()
+     * */
+    private UserPasswordHasherInterface $passwordHasher;
+
+    public function __construct(UserPasswordHasherInterface $passwordHasher)
     {
+        $this->passwordHasher = $passwordHasher;
     }
 
     #[\Override]
@@ -33,13 +37,15 @@ final class UserFactory extends PersistentObjectFactory
     #[\Override]
     protected function defaults(): array|callable
     {
+        $name = self::faker()->firstName() . ' ' . self::faker()->lastName();
         return [
             'active' => self::faker()->boolean(),
-            'email' => self::faker()->text(180),
-            'name' => self::faker()->text(),
-            'password' => self::faker()->text(),
-            'roles' => [],
-            'username' => self::faker()->text(180),
+            'email' => self::faker()->unique()->safeEmail(),
+            'name' => $name,
+            'description' => self::faker()->sentence(rand(15, 75)),
+            'password' => 'password',
+            'roles' => ['ROLE_USER'],
+            'username' => str_replace(' ', '_', strtolower($name)),
         ];
     }
 
@@ -49,8 +55,16 @@ final class UserFactory extends PersistentObjectFactory
     #[\Override]
     protected function initialize(): static
     {
-        return $this
-            // ->afterInstantiate(function(User $user): void {})
-        ;
+        return $this->afterInstantiate(function(User $user): void {
+            $hashedPassword = $this->passwordHasher->hashPassword(
+                $user,
+                $user->getPassword()
+            );
+            $user->setPassword($hashedPassword);
+
+            // Créer les médias associés ici
+            // MediaFactory:createMany(random 1 à 15)->with(['user' => $user]);
+
+        });
     }
 }
