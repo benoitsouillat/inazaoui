@@ -107,6 +107,7 @@
         }
     },
     "require-dev": {
+        "doctrine/doctrine-fixtures-bundle": "^4.3",
         "phpunit/phpunit": "^9.5",
         "symfony/browser-kit": "*",
         "symfony/css-selector": "*",
@@ -114,6 +115,7 @@
         "symfony/maker-bundle": "^1.50",
         "symfony/phpunit-bridge": "^7.1",
         "symfony/stopwatch": "*",
-        "symfony/web-profiler-bundle": "*"
+        "symfony/web-profiler-bundle": "*",
+        "zenstruck/foundry": "^2.9"
     }
 }
