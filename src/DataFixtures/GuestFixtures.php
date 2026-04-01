@@ -15,6 +15,10 @@ class GuestFixtures extends Fixture
 
     public function load(ObjectManager $manager): void
     {
+        /**
+         * BEST PRACTICE : Vider le cache avec make pour être sûr d'avoir une base neuve
+         * Permet de mieux séparer les responsabilités
+         */
         $this->cache->invalidateTags(['guests']);
 
         UserFactory::createMany(6);
