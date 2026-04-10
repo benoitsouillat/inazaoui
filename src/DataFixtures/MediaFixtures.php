@@ -2,15 +2,15 @@
 
 namespace App\DataFixtures;
 
-use App\Factory\AlbumFactory;
+use App\Factory\MediaFactory;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 
-class AlbumFixtures extends Fixture
+class MediaFixtures extends Fixture
 {
     public function load(ObjectManager $manager): void
     {
-        AlbumFactory::createMany(6);
+        MediaFactory::createMany(10);
         $manager->flush();
     }
 }
