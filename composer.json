@@ -83,7 +83,7 @@
         ],
         "test": [
             "composer db-test",
-            "symfony php bin/phpunit"
+            "XDEBUG_MODE=coverage symfony php bin/phpunit --coverage-html var/log/test/test-coverage"
         ],
         "auto-scripts": {
             "cache:clear": "symfony-cmd",
@@ -108,7 +108,7 @@
     },
     "require-dev": {
         "doctrine/doctrine-fixtures-bundle": "^4.3",
-        "phpunit/phpunit": "^9.5",
+        "phpunit/phpunit": "^9",
         "symfony/browser-kit": "*",
         "symfony/css-selector": "*",
         "symfony/debug-bundle": "*",

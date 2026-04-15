@@ -1,24 +1,24 @@
 <?php
 
-namespace App\Tests\unitTests;
+namespace App\Tests\Unit;
 
 use App\Entity\Album;
 use App\Entity\Media;
-use App\Entity\OldUser;
+use App\Entity\User;
 use PHPUnit\Framework\TestCase;
 
 class MediaTest extends TestCase
 {
     private Media $media;
     private Album $album;
-    private OldUser $user;
+    private User $user;
 
     public function setUp(): void
     {
         $this->album = new Album();
         $this->album->setName('Album 1');
 
-        $this->user = new OldUser;
+        $this->user = new User;
         $this->user->setName('user1');
 
         $this->media = new Media();
