@@ -12,7 +12,6 @@ use Symfony\Contracts\Cache\TagAwareCacheInterface;
 
 class GuestSubscriber implements EventSubscriberInterface
 {
-
     public function __construct(
         private readonly UserMailerService $mailerService,
         private readonly TagAwareCacheInterface $cache,

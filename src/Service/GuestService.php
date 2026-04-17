@@ -6,9 +6,9 @@ namespace App\Service;
 
 use App\Entity\User;
 use App\Event\GuestEvent;
+use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 
-use Doctrine\ORM\Query\ResultSetMappingBuilder;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Contracts\Cache\ItemInterface;
@@ -33,24 +33,12 @@ class GuestService
     public function getGuests(string $role): array
     {
         $cacheKey = 'guests_list_' . $role;
+        $userRepository = $this->manager->getRepository(User::class);
 
-        return $this->cache->get($cacheKey, function (ItemInterface $item) use ($role) {
-        $rsm = new ResultSetMappingBuilder($this->manager);
-            $rsm->addRootEntityFromClassMetadata(User::class, 'u');
-
-            $sql = 'SELECT ' . $rsm->generateSelectClause() . '
-                        FROM "user" u
-                        WHERE u.roles::text LIKE :role
-                        AND u.roles::text NOT LIKE :admin
-                        ORDER BY u.name ASC';
-
-            $query = $this->manager->createNativeQuery($sql, $rsm);
-            $query->setParameter('role', '%' . $role . '%');
-            $query->setParameter('admin', '%ROLE_ADMIN%');
-
+        return $this->cache->get($cacheKey, function (ItemInterface $item) use ($role, $userRepository) {
             $item->tag('guests');
 
-            return $query->getResult();
+            return $userRepository->getUsersNotAdmin($role);
         });
     }
 
@@ -62,23 +50,12 @@ class GuestService
     public function getActiveGuests(): array
     {
         $cacheKey = 'guests_active_list';
+        $userRepository = $this->manager->getRepository(User::class);
 
-        return $this->cache->get($cacheKey, function (ItemInterface $item) {
-            $rsm = new ResultSetMappingBuilder($this->manager);
-            $rsm->addRootEntityFromClassMetadata(User::class, 'u');
-
-            $sql = 'SELECT ' . $rsm->generateSelectClause() . '
-                        FROM "user" u
-                        WHERE u.active = true
-                        AND u.roles::text NOT LIKE :admin
-                        ORDER BY u.name ASC';
-
-            $query = $this->manager->createNativeQuery($sql, $rsm);
-            $query->setParameter('admin', '%ROLE_ADMIN%');
-
+        return $this->cache->get($cacheKey, function (ItemInterface $item) use ($userRepository) {
             $item->tag('guests');
 
-            return $query->getResult();
+            return $userRepository->getActiveGuestsNotAdmin();
         });
     }
 

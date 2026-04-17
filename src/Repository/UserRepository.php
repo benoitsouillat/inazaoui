@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Query\ResultSetMappingBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bridge\Doctrine\Security\User\UserLoaderInterface;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
@@ -49,4 +50,40 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
             ->getOneOrNullResult();
     }
 
+    // Retourne tous les utilisateurs non administrateurs ayant ce rôle
+    public function getUsersNotAdmin($role): array
+    {
+        $rsm = new ResultSetMappingBuilder($this->getEntityManager());
+        $rsm->addRootEntityFromClassMetadata(User::class, 'u');
+
+        $sql = 'SELECT ' . $rsm->generateSelectClause() . '
+                        FROM "user" u
+                        WHERE u.roles::text LIKE :role
+                        AND u.roles::text NOT LIKE :admin
+                        ORDER BY u.name ASC';
+
+        $query = $this->getEntityManager()->createNativeQuery($sql, $rsm);
+        $query->setParameter('role', '%' . $role . '%');
+        $query->setParameter('admin', '%ROLE_ADMIN%');
+
+        return $query->getResult();
+    }
+
+    // Retourne tous les guests
+    public function getActiveGuestsNotAdmin(): array
+    {
+        $rsm = new ResultSetMappingBuilder($this->getEntityManager());
+        $rsm->addRootEntityFromClassMetadata(User::class, 'u');
+
+        $sql = 'SELECT ' . $rsm->generateSelectClause() . '
+                    FROM "user" u
+                    WHERE u.active = true
+                    AND u.roles::text NOT LIKE :admin
+                    ORDER BY u.name ASC';
+
+        $query = $this->getEntityManager()->createNativeQuery($sql, $rsm);
+        $query->setParameter('admin', '%ROLE_ADMIN%');
+
+        return $query->getResult();
+    }
 }

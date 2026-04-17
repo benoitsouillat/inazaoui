@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Tests\unitTests;
+namespace App\Tests\Unit;
 
 use App\Entity\Album;
 use PHPUnit\Framework\TestCase;
@@ -12,17 +12,16 @@ class AlbumTest extends TestCase
     public function setUp(): void
     {
         $this->album = new Album();
+        $this->album->setName('Album 1');
     }
 
     public function testIsTrue()
     {
-        $this->album->setName('Album 1');
         self::assertSame('Album 1', $this->album->getName());
     }
 
     public function testIsFalse()
     {
-        $this->album->setName('Album 2');
-        self::assertNotSame('Album 1', $this->album->getName());
+        self::assertNotSame('Album 2', $this->album->getName());
     }
 }
