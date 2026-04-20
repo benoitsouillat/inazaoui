@@ -43,4 +43,18 @@ class MediaTest extends TestCase
         self::assertNotSame('Album 2', $this->media->getAlbum()->getName());
         self::assertNotSame('user2', $this->media->getUser()->getName());
     }
+
+    public function testIfMediaIsSetToAlbum()
+    {
+        $album2 = new Album();
+        $this->media->setAlbum($album2);
+        self::assertSame($album2, $this->media->getAlbum());
+    }
+
+    public function testIfMediaIsSetToUser()
+    {
+        $user2 = new User();
+        $this->media->setUser($user2);
+        self::assertSame($user2, $this->media->getUser());
+    }
 }

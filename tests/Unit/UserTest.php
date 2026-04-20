@@ -45,7 +45,6 @@ class UserTest extends TestCase
         $this->assertSame(array_unique($roles), $roles);
     }
 
-
     public function testGetNameReturnsSetValue(): void
     {
         $this->assertSame('John', $this->user->getName());
