@@ -27,6 +27,11 @@
         <include>
             <directory suffix=".php">src</directory>
         </include>
+        <exclude>
+            <directory suffix=".php">src/Kernel.php</directory>
+            <directory suffix=".php">src/DataFixtures</directory>
+            <directory suffix=".php">src/Factory</directory>
+        </exclude>
     </coverage>
 
     <listeners>

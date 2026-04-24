@@ -40,6 +40,9 @@ class Media
     #[ORM\Column]
     private string $title;
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function getId(): ?int
     {
         return $this->id;

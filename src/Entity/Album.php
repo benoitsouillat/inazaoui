@@ -16,6 +16,9 @@ class Album
     #[ORM\Column]
     private string $name;
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function getId(): ?int
     {
         return $this->id;
