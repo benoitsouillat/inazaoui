@@ -2,6 +2,7 @@
 
 namespace App\Tests\Functional\Controller;
 
+use App\Entity\Album;
 use App\Entity\User;
 use App\Repository\AlbumRepository;
 use App\Repository\UserRepository;
@@ -100,6 +101,37 @@ class AlbumControllerTest extends WebTestCase
         $this->client->submitForm('Modifier', [
             'album[name]' => 'Nouveau nom Album',
         ]);
+        self::assertResponseStatusCodeSame(302);
+        $this->client->followRedirect();
+        self::assertRouteSame('admin_album_index');
+    }
+
+    public function testUserCanDeleteAlbum(): void
+    {
+        $album1 = new Album();
+        $album1->setName("Test delete");
+        $manager = static::getContainer()->get('doctrine')->getManager();
+        $manager->persist($album1);
+        $manager->flush();
+
+        // Anonyme (Pas de suppression)
+        $this->client->request('GET', $this->router->generate('admin_album_delete', ['id' => $album1->getId()]));
+        self::assertResponseStatusCodeSame(302);
+        $this->client->followRedirect();
+        self::assertRouteSame('admin_login');
+
+        // Guest (Pas de suppression)
+        $userRepository = static::getContainer()->get(UserRepository::class);
+        $guestUser = $userRepository->findOneBy(['email' => 'guest@localhost']);
+        $this->client->loginUser($guestUser);
+
+        $this->client->request('GET', $this->router->generate('admin_album_delete', ['id' => $album1->getId()]));
+        self::assertResponseStatusCodeSame(403);
+
+        // Administrateur
+        $adminUser = $userRepository->findOneBy(['email' => 'ina_zaoui@ina_zaoui.com']);
+        $this->client->loginUser($adminUser);
+        $this->client->request('GET', $this->router->generate('admin_album_delete', ['id' => $album1->getId()]));
         self::assertResponseStatusCodeSame(302);
         $this->client->followRedirect();
         self::assertRouteSame('admin_album_index');
