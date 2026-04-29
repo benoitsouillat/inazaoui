@@ -4,12 +4,15 @@ namespace App\Controller\Admin;
 
 use App\Entity\Album;
 use App\Form\AlbumType;
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
+#[IsGranted("ROLE_ADMIN")]
 class AlbumController extends AbstractController
 {
     public function __construct(
@@ -36,7 +39,7 @@ class AlbumController extends AbstractController
             $this->manager->persist($album);
             $this->manager->flush();
 
-            return $this->redirectToRoute('admin_album_index');
+            return $this->redirectToRoute('admin_album_index', [], Response::HTTP_CREATED);
         }
 
         return $this->render('admin/album/add.html.twig', ['form' => $form->createView()]);

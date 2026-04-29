@@ -16,6 +16,14 @@ class AppFixtures extends Fixture
 
     public function load(ObjectManager $manager): void
     {
+        $guest = new User();
+        $guest->setName('guest');
+        $guest->setUsername('guest');
+        $guest->setDescription('Guest is a user with limited access');
+        $guest->setEmail('guest@localhost');
+        $guest->setPassword($this->passwordHasher->hashPassword($guest, 'guest'));
+
+
         $admin = new User();
         $admin->setName('ina');
         $admin->setUsername('ina');
@@ -24,6 +32,7 @@ class AppFixtures extends Fixture
         $admin->setPassword($this->passwordHasher->hashPassword($admin, 'password'));
         $admin->setRoles(['ROLE_ADMIN']);
 
+        $manager->persist($guest);
         $manager->persist($admin);
         $manager->flush();
     }

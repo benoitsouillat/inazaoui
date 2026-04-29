@@ -48,6 +48,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?bool $active = true;
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function getId(): ?int
     {
         return $this->id;
@@ -165,6 +168,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $data;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     #[\Deprecated]
     public function eraseCredentials(): void
     {

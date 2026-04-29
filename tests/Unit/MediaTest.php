@@ -43,4 +43,24 @@ class MediaTest extends TestCase
         self::assertNotSame('Album 2', $this->media->getAlbum()->getName());
         self::assertNotSame('user2', $this->media->getUser()->getName());
     }
+
+    public function testIfMediaIsSetToAlbum()
+    {
+        $album2 = new Album();
+        $this->media->setAlbum($album2);
+        self::assertSame($album2, $this->media->getAlbum());
+    }
+
+    public function testIfMediaSetUser()
+    {
+        $user2 = new User();
+        $this->media->setUser($user2);
+        self::assertSame($user2, $this->media->getUser());
+    }
+    public function testIfFileIsSetToMedia()
+    {
+        $file = $this->createMock('Symfony\Component\HttpFoundation\File\File');
+        $this->media->setFile($file);
+        self::assertSame($file, $this->media->getFile());
+    }
 }
