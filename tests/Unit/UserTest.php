@@ -120,4 +120,18 @@ class UserTest extends TestCase
         $this->user->setMedias($second);
         $this->assertCount(2, $this->user->getMedias());
     }
+
+    public function testSerializeHashesPassword(): void
+    {
+        $serializedData = $this->user->__serialize();
+
+        $this->assertIsArray($serializedData);
+
+        $expectedHash = hash('crc32c', 'hashed_password');
+
+        $passwordKey = "\0" . User::class . "\0password";
+
+        $this->assertArrayHasKey($passwordKey, $serializedData);
+        $this->assertSame($expectedHash, $serializedData[$passwordKey]);
+    }
 }
