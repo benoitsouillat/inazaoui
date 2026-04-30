@@ -51,7 +51,7 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
     }
 
     // Retourne tous les utilisateurs non administrateurs ayant ce rôle
-    public function getUsersNotAdmin($role): array
+    public function getUsersNotAdmin($role = 'ROLE_USER'): array
     {
         $rsm = new ResultSetMappingBuilder($this->getEntityManager());
         $rsm->addRootEntityFromClassMetadata(User::class, 'u');

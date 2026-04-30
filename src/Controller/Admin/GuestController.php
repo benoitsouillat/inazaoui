@@ -41,7 +41,7 @@ final class GuestController extends AbstractController
                 $this->service->addUser($form->getData());
                 $this->addFlash('success', 'L\'invité a été ajouté avec succès.');
 
-                return $this->redirectToRoute('admin_guest_index');
+                return $this->redirectToRoute('admin_guest_index', [], Response::HTTP_CREATED);
             }
             catch (\Exception $e) {
                 $this->addFlash('danger', $e->getMessage());
