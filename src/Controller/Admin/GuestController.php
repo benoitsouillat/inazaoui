@@ -77,21 +77,18 @@ final class GuestController extends AbstractController
     }
 
     #[Route('/admin/guest/{id}/delete', name: 'admin_guest_delete', methods: Request::METHOD_GET)]
-    public function delete(User $guest, EventDispatcherInterface $dispatcher): Response
+    public function delete(User $guest): Response
     {
-        $dispatcher->dispatch(new GuestEvent($guest), GuestEvent::GUEST_DELETED);
+        $this->service->deleteUser($guest);
         $this->addFlash('success', 'Le compte de l\'invité a bien été supprimé.');
 
         return $this->redirectToRoute('admin_guest_index');
     }
 
     #[Route('/admin/guest/{id}/toggle', name: 'admin_guest_toggle', methods: Request::METHOD_GET)]
-    public function toggle(User $guest, EventDispatcherInterface $dispatcher): Response
+    public function toggle(User $guest): Response
     {
-        $guest->setActive(!$guest->isActive());
-        $dispatcher->dispatch(new GuestEvent($guest), GuestEvent::GUEST_EDITED);
-        $this->manager->persist($guest);
-        $this->manager->flush();
+        $this->service->toggleUser($guest);
         $this->addFlash('success', sprintf('Le compte de l\'invité a bien été %s.', $guest->isActive() ? 'activé' : 'désactivé'));
 
         return $this->redirectToRoute('admin_guest_index');

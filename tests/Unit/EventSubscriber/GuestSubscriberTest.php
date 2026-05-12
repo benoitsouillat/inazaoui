@@ -65,7 +65,7 @@ class GuestSubscriberTest extends TestCase {
         $this->subscriber->cleanGuestCache($event);
     }
 
-    public function testOnGuestDeletedRemovesMediasAndUser(): void
+    public function testOnGuestDeletedRemovesMedias(): void
     {
         $user = new User();
         $media = new Media();
@@ -73,8 +73,8 @@ class GuestSubscriberTest extends TestCase {
         $user->setMedias(new ArrayCollection([$media]));
         $event = new GuestEvent($user);
 
-        $this->manager->expects($this->exactly(2))->method('remove');
-        $this->manager->expects($this->once())->method('flush');
+        $this->manager->expects($this->once())->method('remove')->with($media);
+        $this->manager->expects($this->never())->method('flush');
 
         $this->subscriber->onGuestDeleted($event);
     }

@@ -46,14 +46,10 @@ class GuestSubscriber implements EventSubscriberInterface
     public function onGuestDeleted(GuestEvent $event): void
     {
         $guest = $event->getGuest();
-        $medias = $guest->getMedias();
-        foreach ($medias as $media) {
-
+        foreach ($guest->getMedias() as $media) {
             // unlink($media->getPath()); /* Les médias sont supprimés par Vich_uploader
             $this->manager->remove($media);
         }
-        $this->manager->remove($guest);
-        $this->manager->flush();
     }
 
     public function cleanGuestCache(GuestEvent $event): void

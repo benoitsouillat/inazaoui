@@ -2,3 +2,4 @@
 services:
     App\Service\GuestService:
         public: true
+        autowire: true

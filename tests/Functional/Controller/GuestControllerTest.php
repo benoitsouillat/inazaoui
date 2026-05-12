@@ -3,6 +3,7 @@
 namespace App\Tests\Functional\Controller;
 
 use App\Entity\User;
+use App\Entity\Media;
 use App\Repository\UserRepository;
 use App\Service\GuestService;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -21,15 +22,12 @@ class GuestControllerTest extends WebTestCase
 
     public function tearDown(): void
     {
-        $manager = $this->client->getContainer()->get('doctrine')->getManager();
-        $user = $this->client->getContainer()->get(UserRepository::class)->findOneBy(['email' => 'newguest@localhost']);
+        $this->client->enableReboot();
+
+        $container = $this->client->getContainer();
+        $user = $container->get(UserRepository::class)->findOneBy(['email' => 'newguest@localhost']);
         if ($user) {
-            $manager->getConnection()->executeStatement(
-                'DELETE FROM reset_password_request WHERE user_id = :id',
-                ['id' => $user->getId()]
-            );
-            $manager->remove($user);
-            $manager->flush();
+            $container->get(GuestService::class)->deleteUser($user);
         }
         parent::tearDown();
     }
@@ -256,4 +254,81 @@ class GuestControllerTest extends WebTestCase
         self::assertSelectorExists('.alert-danger');
     }
 
+    public function testDeleteGuestIsRemovingImages(): void
+    {
+        $manager = $this->client->getContainer()->get('doctrine')->getManager();
+
+        $guest = new User();
+        $guest->setName('Guest_to_delete_with_medias')
+            ->setUsername('Guest_to_delete_with_medias')
+            ->setEmail('newguest@localhost')
+            ->setPassword('fake_hashed_password')
+            ->setActive(true)
+            ->setDescription('Guest qui va être supprimé');
+        $manager->persist($guest);
+
+        $media = new Media();
+        $media->setTitle('Photo du guest à supprimer')
+            ->setPath('test-delete.jpg')
+            ->setUser($guest);
+        $manager->persist($media);
+        $manager->flush();
+
+        $mediaTitle = $media->getTitle();
+
+        $this->client->request('GET', $this->router->generate('portfolio'));
+        self::assertResponseIsSuccessful();
+        self::assertSelectorTextContains('body', $mediaTitle);
+
+        // Suppression du Guest
+        $adminUser = $this->client->getContainer()
+            ->get(UserRepository::class)
+            ->findOneBy(['email' => 'ina_zaoui@ina_zaoui.com']);
+        $this->client->loginUser($adminUser);
+        $this->client->request('GET', $this->router->generate('admin_guest_delete', ['id' => $guest->getId()]));
+
+        $this->client->request('GET', $this->router->generate('portfolio'));
+        self::assertResponseIsSuccessful();
+        self::assertSelectorTextNotContains('body', $mediaTitle);
+    }
+
+    public function testDisableGuestDisableImagesFromFront(): void
+    {
+        $manager = $this->client->getContainer()->get('doctrine')->getManager();
+
+        $guest = new User();
+        $guest->setName('Guest_to_disable_with_medias')
+            ->setUsername('Guest_to_disable_with_medias')
+            ->setEmail('newguest@localhost')
+            ->setPassword('fake_hashed_password')
+            ->setActive(true)
+            ->setDescription('Guest qui va être désactivé');
+        $manager->persist($guest);
+
+        $media = new Media();
+        $media->setTitle('Photo du guest à désactiver')
+            ->setPath('test-disable.jpg')
+            ->setUser($guest);
+        $manager->persist($media);
+        $manager->flush();
+
+        $mediaTitle = $media->getTitle();
+        $guestId = $guest->getId();
+
+        $this->client->request('GET', $this->router->generate('portfolio'));
+        self::assertSelectorTextContains('body', $mediaTitle);
+
+        $adminUser = $this->client->getContainer()
+            ->get(UserRepository::class)
+            ->findOneBy(['email' => 'ina_zaoui@ina_zaoui.com']);
+        $this->client->loginUser($adminUser);
+        $this->client->request('GET', $this->router->generate('admin_guest_toggle', ['id' => $guestId]));
+        $manager->clear();
+        $guestReloaded = $this->client->getContainer()->get(UserRepository::class)->find($guestId);
+        self::assertFalse($guestReloaded->isActive());
+
+        $this->client->request('GET', $this->router->generate('portfolio'));
+        self::assertResponseIsSuccessful();
+        self::assertSelectorTextNotContains('body', $mediaTitle);
+    }
 }

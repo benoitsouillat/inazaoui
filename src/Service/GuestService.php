@@ -59,7 +59,7 @@ class GuestService
         });
     }
 
-    public function addUser(User $guest): User| \Exception
+    public function addUser(User $guest): User
     {
         $guest->setRoles(['ROLE_USER']);
         $plainPassword = bin2hex(random_bytes(16));
@@ -74,12 +74,28 @@ class GuestService
         return $guest;
     }
 
-    public function editUser(User $guest): User| \Exception
+    public function editUser(User $guest): User
     {
         $this->dispatcher->dispatch(new GuestEvent($guest), GuestEvent::GUEST_EDITED);
         $this->manager->persist($guest);
         $this->manager->flush();
 
         return $guest;
+    }
+
+    public function toggleUser(User $guest): User
+    {
+        $guest->setActive(!$guest->isActive());
+        $this->dispatcher->dispatch(new GuestEvent($guest), GuestEvent::GUEST_EDITED);
+        $this->manager->persist($guest);
+        $this->manager->flush();
+        return $guest;
+    }
+
+    public function deleteUser(User $guest): void
+    {
+        $this->dispatcher->dispatch(new GuestEvent($guest), GuestEvent::GUEST_DELETED);
+        $this->manager->remove($guest);
+        $this->manager->flush();
     }
 }
