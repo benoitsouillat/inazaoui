@@ -38,7 +38,8 @@ final class MediaFactory extends PersistentObjectFactory
         return [
             'album' => AlbumFactory::random(),
             'user' => UserFactory::random(),
-            'file' => $this->getRandomFixturesImages(),
+            //'file' => $this->getRandomFixturesImages(), // On appele pas la propriété file pour court-circuiter Vich et forcer le nom original pour les fixtures
+            'path' => $this->copyRandomFixtureImage(),
             'createdAt' => self::faker()->dateTime(),
             'title' => self::faker()->text(),
             'updatedAt' => self::faker()->dateTime(),
@@ -56,10 +57,33 @@ final class MediaFactory extends PersistentObjectFactory
         ;
     }
 
+    private function copyRandomFixtureImage(): string
+    {
+        $sourceDirectory = __DIR__ . '/../../assets/images/fixtures';
+        $images = glob($sourceDirectory . '/*.{jpg,jpeg,png,gif}', GLOB_BRACE);
+
+        if (empty($images)) {
+            throw new \RuntimeException(sprintf('Aucune image de test trouvée dans "%s".', $sourceDirectory));
+        }
+
+        $randomImage = $images[array_rand($images)];
+        $fileName = basename($randomImage);
+
+        $uploadDir = __DIR__ . '/../../public/uploads';
+        if (!is_dir($uploadDir)) {
+            mkdir($uploadDir, 0775, true);
+        }
+
+        copy($randomImage, $uploadDir . '/' . $fileName);
+
+        return $fileName;
+    }
+
     private function getRandomFixturesImages(): UploadedFile
     {
         $sourceDirectory = __DIR__ . '/../../assets/images/fixtures';
         $images = glob($sourceDirectory . '/*.{jpg,jpeg,png,gif}', GLOB_BRACE);
+
 
         if (empty($images)) {
             throw new \RuntimeException(sprintf('Aucune image de test trouvée dans le dossier "%s".', $sourceDirectory));
