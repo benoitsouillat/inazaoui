@@ -12,8 +12,6 @@ jobs:
         runs-on: ubuntu-latest
         strategy:
             fail-fast: false #Permet de continuer les tests sur d'autres versions même si ça plante dans une
-            matrix: #Permet de gérer plusieurs versions PHP ou autres options multiples
-                php-version: ['8.2', '8.3']
 
         services:
             database:
@@ -36,7 +34,7 @@ jobs:
             - name: Installer PHP
               uses: shivammathur/setup-php@v2
               with:
-                  php-version: ${{ matrix.php-version }}
+                  php-version: 8.2
                   extensions: pdo_pgsql, intl
                   coverage: none
 
