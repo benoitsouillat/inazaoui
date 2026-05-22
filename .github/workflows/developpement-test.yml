@@ -1,10 +1,48 @@
 name: developpement-test.yml
+
+permissions:
+    contents: read
+
 on:
-    - push
+    push:
+        branches: [master]
 
 jobs:
     test:
         runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                php-version: ['8.1', '8.2', '8.3']
+
+        services:
+            database:
+                image: postgres:16
+                env:
+                    POSTGRES_USER: postgres
+                    POSTGRES_PASSWORD: postgres
+                    POSTGRES_DB: ina_zaoui
+                ports:
+                    - 5432:5432
+                options: >-
+                    --health-cmd "pg_isready"
+                    --health-interval 10s
+                    --health-timeout 6s
+                    --health-retry 2
+
         steps:
-            - uses: actions/checkout@v4
-            - run: composer test
+            - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11
+
+            - name: Installer PHP
+              uses: shivammathur/setup-php@v2
+              with:
+                  php-version: ${{ matrix.php-version }}
+                  extensions: pdo_pgsql, intl
+                  coverage: none
+
+            - name: Installer Symfony CLI
+              run: |
+                  curl -sS https://get.symfony.com/cli/installer | bash
+                  sudo mv /root/.symfony5/bin/symfony /usr/local/bin/symfony
+
+            - name: Installer les dépendances
+              run: composer install --prefer-dist --no-progress
