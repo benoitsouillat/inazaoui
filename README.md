@@ -2,7 +2,7 @@
 
 ## Prérequis
 
-- PHP >= 8.1
+- PHP >= 8.2
 - Composer
 - PostgreSQL 16
 - Symfony CLI (`symfony`)

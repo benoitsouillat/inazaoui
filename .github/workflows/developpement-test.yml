@@ -11,8 +11,9 @@ jobs:
     test:
         runs-on: ubuntu-latest
         strategy:
-            matrix:
-                php-version: ['8.1', '8.2', '8.3']
+            fail-fast: false #Permet de continuer les tests sur d'autres versions même si ça plante dans une
+            matrix: #Permet de gérer plusieurs versions PHP ou autres options multiples
+                php-version: ['8.2', '8.3']
 
         services:
             database:
@@ -38,11 +39,6 @@ jobs:
                   php-version: ${{ matrix.php-version }}
                   extensions: pdo_pgsql, intl
                   coverage: none
-
-            - name: Installer Symfony CLI
-              run: |
-                  curl -sS https://get.symfony.com/cli/installer | bash
-                  sudo mv /root/.symfony5/bin/symfony /usr/local/bin/symfony
 
             - name: Installer les dépendances
               run: composer install --prefer-dist --no-progress
