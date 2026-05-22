@@ -28,7 +28,7 @@ jobs:
                     --health-cmd "pg_isready"
                     --health-interval 10s
                     --health-timeout 6s
-                    --health-retries 2
+                    --health-retries 5
 
         steps:
             - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11
@@ -44,6 +44,6 @@ jobs:
               run: composer install --prefer-dist --no-progress
 
             - name: Lancement des tests
-              run: composer test
+              run: composer test-ci
               env:
                 DATABASE_URL: "postgresql://postgres:postgres@127.0.0.1:5432/ina_zaoui_test?serverVersion=16&charset=utf8"
