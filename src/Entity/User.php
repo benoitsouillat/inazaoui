@@ -43,8 +43,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $password = null;
 
 
-    /** On ajoute l'option EAGER pour que doctrine ne fasse pas de requètes inutiles lors de la récupération d'un ou des utilisateurs. */
-    #[ORM\OneToMany(targetEntity: Media::class, mappedBy: 'user', fetch: 'EAGER')]
+    #[ORM\OneToMany(targetEntity: Media::class, mappedBy: 'user')]
     private Collection $medias;
 
     #[ORM\Column]

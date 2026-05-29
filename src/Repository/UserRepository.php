@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Entity\Media;
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\Query\ResultSetMappingBuilder;
@@ -74,11 +75,14 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
     {
         $rsm = new ResultSetMappingBuilder($this->getEntityManager());
         $rsm->addRootEntityFromClassMetadata(User::class, 'u');
+        $rsm->addScalarResult('media_count', 'mediaCount');
 
-        $sql = 'SELECT ' . $rsm->generateSelectClause() . '
+        $sql = 'SELECT ' . $rsm->generateSelectClause() . ', COUNT(m.id) as media_count
                     FROM "user" u
+                    LEFT JOIN "media" m ON u.id = m.user_id
                     WHERE u.active = true
                     AND u.roles::text NOT LIKE :admin
+                    GROUP BY u.id
                     ORDER BY u.name ASC';
 
         $query = $this->getEntityManager()->createNativeQuery($sql, $rsm);

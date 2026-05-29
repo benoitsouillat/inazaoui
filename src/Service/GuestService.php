@@ -52,10 +52,15 @@ class GuestService
         $cacheKey = 'guests_active_list';
         $userRepository = $this->manager->getRepository(User::class);
 
+        /** Met en cache le résultat de la requète des guests */
         return $this->cache->get($cacheKey, function (ItemInterface $item) use ($userRepository) {
             $item->tag('guests');
 
-            return $userRepository->getActiveGuestsNotAdmin();
+            /** Récupère tous les guests et leur nombre de médias pour éviter d'alourdir la requète */
+            return array_map(fn($row) => [
+                'guest' => $row[0],
+                'mediaCount' => $row['mediaCount']
+            ], $userRepository->getActiveGuestsNotAdmin());
         });
     }
 
