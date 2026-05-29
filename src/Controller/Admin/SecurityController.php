@@ -18,4 +18,10 @@ class SecurityController extends AbstractController
             'error'         => $error,
         ]);
     }
+
+    #[Route('/logout', name: 'admin_logout')]
+    public function logout()
+    {
+        #Cette méthode n'est jamais appelée, elle est intercepté par le firewall - elle sert juste à être nommée
+    }
 }
