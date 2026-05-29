@@ -4,6 +4,7 @@ namespace App\Controller\Admin;
 
 use App\Entity\Media;
 use App\Form\MediaType;
+use App\Service\PaginationService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -14,7 +15,8 @@ class MediaController extends AbstractController
 {
 
     public function __construct(
-        private readonly EntityManagerInterface $manager
+        private readonly EntityManagerInterface $manager,
+        private readonly PaginationService $paginationService
     )
     {}
 
@@ -22,7 +24,7 @@ class MediaController extends AbstractController
     public function index(Request $request): Response
     {
         $page = $request->query->getInt('page', 1);
-
+        $limit = 25;
         $criteria = [];
 
         if (!$this->isGranted('ROLE_ADMIN')) {
@@ -32,14 +34,15 @@ class MediaController extends AbstractController
         $medias = $this->manager->getRepository(Media::class)->findBy(
             $criteria,
             ['id' => 'ASC'],
-            25,
-            25 * ($page - 1)
+            $limit,
+            $limit * ($page - 1)
         );
-        $total = $this->manager->getRepository(Media::class)->count([]);
+        $totalMedias = $this->manager->getRepository(Media::class)->countAllByCriteria($criteria);
+        $totalPages = $this->paginationService->calculateTotalPages($totalMedias, $limit);
 
         return $this->render('admin/media/index.html.twig', [
             'medias' => $medias,
-            'total' => $total,
+            'totalPages' => $totalPages,
             'page' => $page
         ]);
     }

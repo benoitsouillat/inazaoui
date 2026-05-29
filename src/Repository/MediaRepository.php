@@ -34,15 +34,43 @@ class MediaRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-    public function findAllActive()
+    public function countAllByCriteria(array $criteria)
+    {
+        $queryBuilder = $this->createQueryBuilder('m')
+            ->select('COUNT(m.id)');
+
+        if (!empty($criteria)) {
+            $queryBuilder->join('m.user', 'u')
+                ->andWhere('u = :user')
+                ->setParameter('user', $criteria['user']);
+        }
+
+
+        return $queryBuilder->getQuery()->getSingleScalarResult();
+    }
+
+    public function countAllActive()
+    {
+        return $this->createQueryBuilder('m')
+            ->select('COUNT(m.id)')
+            ->join('m.user', 'u')
+            ->andWhere('u.active = true')
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    public function findAllActiveByPage($page = 1, $limit = 24)
     {
         return $this->createQueryBuilder('m')
             ->join('m.user', 'u')
             ->andWhere('u.active = true')
             ->orderBy('m.createdAt', 'DESC')
+            ->setFirstResult(($page - 1) * $limit)
+            ->setMaxResults($limit)
             ->getQuery()
             ->getResult();
     }
+
 
 //    /**
 //     * @return Media[] Returns an array of Media objects
