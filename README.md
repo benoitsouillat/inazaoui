@@ -14,7 +14,7 @@
 ### 1. Cloner le dépôt
 
 ```bash
-git clone https://github.com/benoitsouillat/inazaoui.git
+git clone https://github.com/benoitsouillat/inazaoui.git inazaoui
 cd inazaoui
 ```
 ### 2. Vider le cache
@@ -153,20 +153,3 @@ composer test
 ```
 
 Les rapports de couverture sont générés dans `var/log/test/test-coverage/`.
-
-
-__Démarrage du projet :__
-
-* ```shell docker compose up -d``` (Développement uniquement)
-  * -> Configuré pour créer une base de donnée local pour le dev et les tests, ainsi que mailhog pour tester l'envoi des emails
-* ```shell symfony console serve -d``` (Développement uniquement)
-  * -> Démarrage du projet symfony en version 7.4
-* ```shell symfony console doctrine:migrations:migrate```
-  * -> Application des migrations à réaliser depuis la version 5.4 vers la version 7.4
-    * Création des entités User
-    * Mapping des Médias (requiert les médias dans le dossier public/uploads)
-    * Initialisation des séquences Postgres SQL en fonction des données existantes
-    * Création du compte administrateur via un UserProvider (⚠️ En production, il faut réinitialiser immédiatement le mot de passe de 'ina' (Utilisateur 1)
-    * Création des comptes utilisateurs invités avec MOT DE PASSE non conforme à bcrypt (Réinitialisation obligatoire)
-* Mise en ligne des images (Télécharger les images, avec leurs noms actuels dans le dossier public//uploads)
-

@@ -9,7 +9,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-#[AsCommand(name: "initDevEnv", description: "Initialise la base de données à l'identique de la prod 5.4")]
+#[AsCommand(name: "initDevEnv", description: "Initialise la base de données à l'identique de la version 5.4")]
 class InitDevEnv extends Command
 {
     public function __construct(private readonly EntityManagerInterface $em)
