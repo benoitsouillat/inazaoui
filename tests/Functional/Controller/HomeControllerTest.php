@@ -30,7 +30,7 @@ class HomeControllerTest extends WebTestCase
         $this->client->request('GET', $this->router->generate('portfolio'));
         self::assertResponseIsSuccessful();
 
-        $activeMedias = $this->client->getContainer()->get(MediaRepository::class)->findAllActive();
+        $activeMedias = $this->client->getContainer()->get(MediaRepository::class)->findAllActiveByPage(1);
         $images = $this->client->getCrawler()->filter('div.media');
 
         $this->assertCount(count($activeMedias), $images);
