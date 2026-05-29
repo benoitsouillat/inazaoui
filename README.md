@@ -76,7 +76,7 @@ Pour se connecter avec le compte de Ina, il faut utiliser les identifiants suiva
 ### 1. Cloner le dépôt
 
 ```bash
-git clone https://github.com/benoitsouillat/inazaoui.git
+git clone https://github.com/benoitsouillat/inazaoui.git inazaoui
 cd inazaoui
 ```
 

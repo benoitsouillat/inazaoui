@@ -36,7 +36,7 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
     }
 
     // Pour permettre la connexion avec le username ou l'email
-    public function loadUserByIdentifier(string $usernameOrEmail): ?User
+    public function loadUserByIdentifier(string $identifier): ?User
     {
         $entityManager = $this->getEntityManager();
 
@@ -46,11 +46,11 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
                 WHERE u.username = :query
                 OR u.email = :query'
         )
-            ->setParameter('query', $usernameOrEmail)
+            ->setParameter('query', $identifier)
             ->getOneOrNullResult();
     }
 
-    // Retourne tous les utilisateurs non administrateurs ayant ce rôle
+    // Retourne tous les utilisateurs non-administrateurs ayant ce rôle
     public function getUsersNotAdmin($role = 'ROLE_USER'): array
     {
         $rsm = new ResultSetMappingBuilder($this->getEntityManager());
