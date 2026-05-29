@@ -21,6 +21,7 @@ security:
             form_login:
                 login_path: admin_login
                 check_path: admin_login
+                default_target_path: admin_media_index
             logout:
                 path: /logout
             user_checker: App\Security\UserChecker
