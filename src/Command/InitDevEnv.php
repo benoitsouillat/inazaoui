@@ -62,6 +62,7 @@ class InitDevEnv extends Command
         $sqlContent = file_get_contents($filePath);
         $queries = explode(';', $sqlContent);
         foreach ($queries as $query) {
+            $query = str_replace('uploads/', '', $query);
             if (trim($query) !== '') {
                 $conn->executeQuery($query);
             }

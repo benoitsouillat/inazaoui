@@ -119,6 +119,8 @@ Charge les tables et données issues de la version 5.4 :
 symfony console initDevEnv
 ```
 
+*(Si vous voulez utiliser le site en version 5.4, il faut remettre le provider pour l'authentification en version memory_provider - Ne pas utiliser ce provider en production -)*
+
 Puis appliquer les migrations vers la 7.4 :
 
 ```bash
