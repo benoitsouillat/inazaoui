@@ -18,7 +18,6 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 final class GuestController extends AbstractController
 {
     public function __construct(
-        private readonly EntityManagerInterface $manager,
         private readonly GuestService $service
     )
     {}

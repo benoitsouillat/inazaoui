@@ -78,28 +78,4 @@ final class MediaFactory extends PersistentObjectFactory
 
         return $fileName;
     }
-
-    private function getRandomFixturesImages(): UploadedFile
-    {
-        $sourceDirectory = __DIR__ . '/../../assets/images/fixtures';
-        $images = glob($sourceDirectory . '/*.{jpg,jpeg,png,gif}', GLOB_BRACE);
-
-
-        if (empty($images)) {
-            throw new \RuntimeException(sprintf('Aucune image de test trouvée dans le dossier "%s".', $sourceDirectory));
-        }
-
-        $randomImage = $images[array_rand($images)];
-        $tempFilename = sys_get_temp_dir() . '/' . uniqid('fixture_') . '_' . basename($randomImage);
-
-        copy($randomImage, $tempFilename);
-
-        return new UploadedFile(
-            $tempFilename,
-            basename($randomImage),
-            mime_content_type($tempFilename) ?: 'image/jpeg',
-            null,
-            true // <-- LE MODE TEST : Demande à Symfony d'ignorer "is_uploaded_file()"
-        );
-    }
 }
