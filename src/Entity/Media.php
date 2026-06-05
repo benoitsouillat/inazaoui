@@ -29,6 +29,7 @@ class Media
     #[Assert\File(
         maxSize: '2M',
         mimeTypes: ['image/jpeg', 'image/png', 'image/gif'],
+        maxSizeMessage: 'Cette image est trop lourde., elle ne doit pas dépasser 2Mo.',
         mimeTypesMessage: 'Merci d\'utiliser une image (JPEG, PNG, GIF) n\'excédant pas 2MB.'
     )]
     #[Vich\UploadableField(mapping: 'medias', fileNameProperty: 'path')]
