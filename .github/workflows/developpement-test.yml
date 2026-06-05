@@ -10,8 +10,6 @@ on:
 jobs:
     test:
         runs-on: ubuntu-latest
-        strategy:
-            fail-fast: false #Permet de continuer les tests sur d'autres versions même si ça plante dans une
 
         services:
             database:
@@ -40,6 +38,9 @@ jobs:
 
             - name: Installer les dépendances
               run: composer install --prefer-dist --no-progress
+
+            - name: Lancement de PHPStan
+              run: composer phpstan
 
             - name: Lancement des tests
               run: composer test-ci
