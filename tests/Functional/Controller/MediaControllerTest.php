@@ -52,7 +52,7 @@ class MediaControllerTest extends WebTestCase
         $this->assertCount($mediaCount, $rows);
     }
 
-    public function testIfUserHasNotAccessToAdminMedia(): void
+    public function testIfUserHasAccessToAdminMedia(): void
     {
         // Anonyme
         $this->client->request('GET', $this->router->generate('admin_media_index'));
@@ -65,7 +65,7 @@ class MediaControllerTest extends WebTestCase
         // ROLE_USER
         $this->client->loginUser($userRepository->findOneBy(['email' => 'guest@localhost']));
         $this->client->request('GET', $this->router->generate('admin_media_index'));
-        self::assertResponseStatusCodeSame(403);
+        self::assertResponseStatusCodeSame(200);
 
         // ROLE_ADMIN
         $this->client->loginUser($userRepository->findOneBy(['email' => 'ina_zaoui@ina_zaoui.com']));
@@ -86,7 +86,7 @@ class MediaControllerTest extends WebTestCase
         // ROLE_USER
         $this->client->loginUser($userRepository->findOneBy(['email' => 'guest@localhost']));
         $this->client->request('GET', $this->router->generate('admin_media_add'));
-        self::assertResponseStatusCodeSame(403);
+        self::assertResponseStatusCodeSame(200);
 
         // ROLE_ADMIN — GET
         $adminUser = $userRepository->findOneBy(['email' => 'ina_zaoui@ina_zaoui.com']);
@@ -104,15 +104,15 @@ class MediaControllerTest extends WebTestCase
         self::assertRouteSame('admin_media_index');
     }
 
-    public function testUserCanDeleteMedia(): void
+    public function testGuestCanDeleteMedia(): void
     {
-        $manager = $this->client->getContainer()->get('doctrine')->getManager();
         $userRepository = $this->client->getContainer()->get(UserRepository::class);
-        $adminUser = $userRepository->findOneBy(['email' => 'ina_zaoui@ina_zaoui.com']);
+        $manager = $this->client->getContainer()->get('doctrine')->getManager();
+        $guestUser = $userRepository->findOneBy(['email' => 'guest@localhost']);
 
         $media = new Media();
         $media->setTitle('Media test à supprimer')
-              ->setUser($adminUser);
+            ->setUser($guestUser);
         $manager->persist($media);
         $manager->flush();
 
@@ -123,9 +123,22 @@ class MediaControllerTest extends WebTestCase
         self::assertRouteSame('admin_login');
 
         // ROLE_USER
-        $this->client->loginUser($userRepository->findOneBy(['email' => 'guest@localhost']));
+        $this->client->loginUser($guestUser);
         $this->client->request('GET', $this->router->generate('admin_media_delete', ['id' => $media->getId()]));
-        self::assertResponseStatusCodeSame(403);
+        self::assertResponseStatusCodeSame(302);
+
+    }
+    public function testAdminCanDeleteMedia(): void
+    {
+        $userRepository = $this->client->getContainer()->get(UserRepository::class);
+        $manager = $this->client->getContainer()->get('doctrine')->getManager();
+        $adminUser = $userRepository->findOneBy(['email' => 'ina_zaoui@ina_zaoui.com']);
+
+        $media = new Media();
+        $media->setTitle('Media test à supprimer');
+        $media->setUser($adminUser);
+        $manager->persist($media);
+        $manager->flush();
 
         // ROLE_ADMIN
         $this->client->loginUser($adminUser);
@@ -133,5 +146,23 @@ class MediaControllerTest extends WebTestCase
         self::assertResponseStatusCodeSame(302);
         $this->client->followRedirect();
         self::assertRouteSame('admin_media_index');
+    }
+    public function testUserCanNotDeleteMediaOfOtherUsers(): void
+    {
+        $userRepository = $this->client->getContainer()->get(UserRepository::class);
+        $manager = $this->client->getContainer()->get('doctrine')->getManager();
+        $guestUser = $userRepository->findOneBy(['email' => 'guest@localhost']);
+        $adminUser = $userRepository->findOneBy(['email' => 'ina_zaoui@ina_zaoui.com']);
+
+        $media = new Media();
+        $media->setTitle('Media test à supprimer');
+        $media->setUser($adminUser);
+        $manager->persist($media);
+        $manager->flush();
+
+        // ROLE_USER dont le média ne lui appartient pas
+        $this->client->loginUser($guestUser);
+        $this->client->request('GET', $this->router->generate('admin_media_delete', ['id' => $media->getId()]));
+        self::assertResponseStatusCodeSame(403);
     }
 }
