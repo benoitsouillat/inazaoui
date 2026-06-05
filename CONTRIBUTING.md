@@ -122,16 +122,9 @@ git push origin feature/ma-fonctionnalite
 
 Ouvrir une Pull Request sur GitHub vers `master` en remplissant :
 
-- **Titre** : clair et concis (suit le format Conventional Commits)
+- **Titre** : clair et concis
 - **Description** : ce que fait la PR, pourquoi, et comment la tester
 - **Lien** vers l'issue associée si applicable
-
-### 5. Soumettre un problème ou une idée
-
-Pour signaler un bug ou proposer une fonctionnalité, ouvrir une **Issue** GitHub en précisant :
-
-- **Bug** : étapes pour reproduire, comportement attendu vs observé, environnement (navigateur, OS)
-- **Fonctionnalité** : contexte, besoin utilisateur, proposition de solution
 
 ---
 
@@ -161,14 +154,12 @@ composer phpstan
 ### Tests
 
 - Utiliser **PHPUnit** pour les tests unitaires et fonctionnels
-- Les fixtures (données de test) sont dans `src/DataFixtures/`
-- Préférer des tests qui vérifient le comportement métier plutôt que l'implémentation interne
-
+- Les fixtures (données de test) sont dans `src/DataFixtures/` et utilisent Factory dans `src/Factory/`
+- 
 ### Sécurité
 
 - Ne jamais committer de fichier `.env.local` ou contenant des secrets
 - Valider toutes les entrées utilisateur côté serveur (pas uniquement côté client)
-- Les fichiers uploadés doivent être validés en type (image uniquement) et en poids (≤ 2 Mo)
 
 ### Base de données
 
