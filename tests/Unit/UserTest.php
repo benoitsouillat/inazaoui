@@ -124,9 +124,6 @@ class UserTest extends TestCase
     public function testSerializeHashesPassword(): void
     {
         $serializedData = $this->user->__serialize();
-
-        $this->assertIsArray($serializedData);
-
         $expectedHash = hash('crc32c', 'hashed_password');
 
         $passwordKey = "\0" . User::class . "\0password";

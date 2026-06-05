@@ -3,6 +3,7 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Media;
+use App\Entity\User;
 use App\Form\MediaType;
 use App\Service\PaginationService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -28,7 +29,9 @@ class MediaController extends AbstractController
         $criteria = [];
 
         if (!$this->isGranted('ROLE_ADMIN')) {
-            $criteria['user'] = $this->getUser();
+            /** @var User $user */
+            $user = $this->getUser();
+            $criteria['user'] = $user;
         }
 
         $medias = $this->manager->getRepository(Media::class)->findBy(
@@ -56,7 +59,9 @@ class MediaController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             if (!$this->isGranted('ROLE_ADMIN')) {
-                $media->setUser($this->getUser());
+                /** @var User $user */
+                $user = $this->getUser();
+                $media->setUser($user);
             }
             $this->manager->persist($media);
             $this->manager->flush();
