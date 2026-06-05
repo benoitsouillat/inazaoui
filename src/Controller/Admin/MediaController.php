@@ -5,12 +5,14 @@ namespace App\Controller\Admin;
 use App\Entity\Media;
 use App\Entity\User;
 use App\Form\MediaType;
+use App\Security\Voter\MediaVoter;
 use App\Service\PaginationService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 class MediaController extends AbstractController
 {
@@ -21,6 +23,7 @@ class MediaController extends AbstractController
     )
     {}
 
+    #[IsGranted('ROLE_USER')]
     #[Route('/admin/media', name: 'admin_media_index', methods: Request::METHOD_GET)]
     public function index(Request $request): Response
     {
@@ -50,6 +53,7 @@ class MediaController extends AbstractController
         ]);
     }
 
+    #[IsGranted('ROLE_USER')]
     #[Route('/admin/media/add', name: 'admin_media_add', methods: [Request::METHOD_GET, Request::METHOD_POST])]
     public function add(Request $request): Response
     {
@@ -72,6 +76,7 @@ class MediaController extends AbstractController
         return $this->render('admin/media/add.html.twig', ['form' => $form->createView()]);
     }
 
+    #[IsGranted(MediaVoter::DELETE, subject: 'media')]
     #[Route('/admin/media/delete/{id}', name: 'admin_media_delete', methods: Request::METHOD_GET)]
     public function delete(Media $media): Response
     {
