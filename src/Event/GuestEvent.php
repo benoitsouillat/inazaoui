@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Event;
 
 use App\Entity\User;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 
 final class GuestEvent extends Event
@@ -14,11 +15,11 @@ final class GuestEvent extends Event
     public const GUEST_DELETED = 'guest.deleted';
 
     public function __construct(
-        private readonly User $guest
+        private readonly UserInterface $guest
     )
     {}
 
-    public function getGuest(): User
+    public function getGuest(): UserInterface
     {
         return $this->guest;
     }

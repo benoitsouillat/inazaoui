@@ -56,7 +56,7 @@ class GuestService
         return $this->cache->get($cacheKey, function (ItemInterface $item) use ($userRepository) {
             $item->tag('guests');
 
-            /** Récupère tous les guests et leur nombre de médias pour éviter d'alourdir la requète */
+            /** Récupère tous les guests ayant un média et leur nombre de médias pour éviter d'alourdir la requète */
             return array_map(fn($row) => [
                 'guest' => $row[0],
                 'mediaCount' => $row['mediaCount']

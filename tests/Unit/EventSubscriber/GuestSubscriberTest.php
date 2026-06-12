@@ -62,7 +62,7 @@ class GuestSubscriberTest extends TestCase {
             ->method('invalidateTags')
             ->with(['guests']);
 
-        $this->subscriber->cleanGuestCache($event);
+        $this->subscriber->cleanGuestCache();
     }
 
     public function testOnGuestDeletedRemovesMedias(): void

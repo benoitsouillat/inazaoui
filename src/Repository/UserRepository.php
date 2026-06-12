@@ -70,7 +70,7 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         return $query->getResult();
     }
 
-    // Retourne tous les guests
+    // Retourne tous les guests non Admin ayant au moins un Média
     public function getActiveGuestsNotAdmin(): array
     {
         $rsm = new ResultSetMappingBuilder($this->getEntityManager());
@@ -79,7 +79,7 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
 
         $sql = 'SELECT ' . $rsm->generateSelectClause() . ', COUNT(m.id) as media_count
                     FROM "user" u
-                    LEFT JOIN "media" m ON u.id = m.user_id
+                    INNER JOIN "media" m ON u.id = m.user_id
                     WHERE u.active = true
                     AND u.roles::text NOT LIKE :admin
                     GROUP BY u.id

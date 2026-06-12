@@ -50,11 +50,10 @@ class HomeControllerTest extends WebTestCase
 
     }
 
-    public function testGuestsShowsOnlyActiveGuests(): void
+    public function testGuestsShowsOnlyGuestWithOneOrMoreMedia(): void
     {
         $this->client->request('GET', $this->router->generate('guests'));
         self::assertResponseIsSuccessful();
-
         $activeGuests = $this->client->getContainer()->get(UserRepository::class)->getActiveGuestsNotAdmin();
         $cards = $this->client->getCrawler()->filter('div.guest');
 
