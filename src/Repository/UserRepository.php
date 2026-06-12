@@ -79,7 +79,7 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
 
         $sql = 'SELECT ' . $rsm->generateSelectClause() . ', COUNT(m.id) as media_count
                     FROM "user" u
-                    LEFT JOIN "media" m ON u.id = m.user_id
+                    INNER JOIN "media" m ON u.id = m.user_id
                     WHERE u.active = true
                     AND u.roles::text NOT LIKE :admin
                     GROUP BY u.id
