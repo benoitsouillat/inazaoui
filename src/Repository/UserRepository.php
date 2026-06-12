@@ -70,7 +70,7 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         return $query->getResult();
     }
 
-    // Retourne tous les guests
+    // Retourne tous les guests non Admin ayant au moins un Média
     public function getActiveGuestsNotAdmin(): array
     {
         $rsm = new ResultSetMappingBuilder($this->getEntityManager());

@@ -4,11 +4,13 @@ namespace App\Controller\Admin;
 
 use App\Entity\Media;
 use App\Entity\User;
+use App\Event\GuestEvent;
 use App\Form\MediaType;
 use App\Security\Voter\MediaVoter;
 use App\Service\PaginationService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -19,7 +21,9 @@ class MediaController extends AbstractController
 
     public function __construct(
         private readonly EntityManagerInterface $manager,
-        private readonly PaginationService $paginationService
+        private readonly PaginationService $paginationService,
+        private readonly EventDispatcherInterface $dispatcher,
+
     )
     {}
 
@@ -62,11 +66,12 @@ class MediaController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $user = $this->getUser();
             if (!$this->isGranted('ROLE_ADMIN')) {
                 /** @var User $user */
-                $user = $this->getUser();
                 $media->setUser($user);
             }
+            $this->dispatcher->dispatch(new GuestEvent($user), GuestEvent::GUEST_EDITED);
             $this->manager->persist($media);
             $this->manager->flush();
 
@@ -80,6 +85,7 @@ class MediaController extends AbstractController
     #[Route('/admin/media/delete/{id}', name: 'admin_media_delete', methods: Request::METHOD_GET)]
     public function delete(Media $media): Response
     {
+        $this->dispatcher->dispatch(new GuestEvent($this->getUser()), GuestEvent::GUEST_EDITED);
         $this->manager->remove($media);
         $this->manager->flush();
 

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\EventSubscriber;
 
+use App\Entity\User;
 use App\Event\GuestEvent;
 use App\Service\UserMailerService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -37,6 +38,7 @@ class GuestSubscriber implements EventSubscriberInterface
 
     public function onGuestCreated(GuestEvent $event): void
     {
+        /** @var User $guest */
         $guest = $event->getGuest();
 
         // Envoie un email de bienvenue à l'invité
@@ -45,6 +47,7 @@ class GuestSubscriber implements EventSubscriberInterface
 
     public function onGuestDeleted(GuestEvent $event): void
     {
+        /** @var User $guest */
         $guest = $event->getGuest();
         foreach ($guest->getMedias() as $media) {
             // unlink($media->getPath()); /* Les médias sont supprimés par Vich_uploader
@@ -52,7 +55,7 @@ class GuestSubscriber implements EventSubscriberInterface
         }
     }
 
-    public function cleanGuestCache(GuestEvent $event): void
+    public function cleanGuestCache(): void
     {
         $this->cache->invalidateTags(['guests']);
     }
