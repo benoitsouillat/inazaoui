@@ -27,7 +27,7 @@
                         <td>{{ media.album.name ?? '' }}</td>
                     {% endif %}
                     <td>
-                        <a href="{{ path('admin_media_delete', {id: media.id}) }}" class="btn btn-danger">Supprimer</a>
+                        <a href="{{ path('admin_media_delete', {id: media.id}) }}" class="btn btn-danger" data-confirm="Êtes-vous sûr de vouloir supprimer ce média ?">Supprimer</a>
                     </td>
                 </tr>
             {% endfor %}

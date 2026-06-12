@@ -28,7 +28,7 @@
                     <div class="d-flex flex-column align-items-start gap-2">
                         <a href="{{ path('admin_guest_update', {id: guest.id}) }}" class="btn btn-sm btn-warning">Modifier</a>
                         <a href="{{ path('admin_guest_toggle', {id: guest.id}) }}" class="btn btn-sm {{ guest.active ? "btn-dark" : "btn-success" }}">{{ guest.active ? "Désactiver" : "Activer" }}</a>
-                        <a href="{{ path('admin_guest_delete', {id: guest.id}) }}" class="btn btn-sm btn-danger">Supprimer</a>
+                        <a href="{{ path('admin_guest_delete', {id: guest.id}) }}" class="btn btn-sm btn-danger" data-confirm="Êtes-vous sûr de vouloir supprimer cet utilisateur et toutes ses images ?">Supprimer</a>
                     </div>
                 </td>
             </tr>
