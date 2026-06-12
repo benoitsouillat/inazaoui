@@ -3,6 +3,7 @@
 namespace App\Tests\Functional\Controller;
 
 use App\Entity\Album;
+use App\Entity\Media;
 use App\Entity\User;
 use App\Repository\AlbumRepository;
 use App\Repository\UserRepository;
@@ -135,6 +136,42 @@ class AlbumControllerTest extends WebTestCase
         self::assertResponseStatusCodeSame(302);
         $this->client->followRedirect();
         self::assertRouteSame('admin_album_index');
+    }
+
+    public function testIfDeleteAlbumSettingMediaToNull(): void
+    {
+        $userRepository = static::getContainer()->get(UserRepository::class);
+        $adminUser = $userRepository->findOneBy(['email' => 'ina_zaoui@ina_zaoui.com']);
+        $this->client->loginUser($adminUser);
+
+        $manager = static::getContainer()->get('doctrine')->getManager();
+
+        $album = new Album();
+        $album->setName("Test delete");
+        $manager->persist($album);
+
+        $media = new Media();
+        $media->setTitle("Test Media");
+        $media->setUser($adminUser);
+        $media->setAlbum($album);
+        $manager->persist($media);
+
+        $manager->flush();
+
+        $albumId = $album->getId();
+        $mediaId = $media->getId();
+
+        $this->client->request('GET', $this->router->generate('admin_album_delete', ['id' => $albumId]));
+        self::assertResponseStatusCodeSame(302);
+
+        $freshManager = static::getContainer()->get('doctrine')->getManager();
+        $freshManager->clear();
+
+        $freshMedia = $freshManager->getRepository(Media::class)->find($mediaId);
+
+        self::assertNotNull($freshMedia);
+        self::assertNull($freshMedia->getAlbum());
+
     }
 
 }
