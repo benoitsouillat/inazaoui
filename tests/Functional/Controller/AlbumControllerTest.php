@@ -173,5 +173,4 @@ class AlbumControllerTest extends WebTestCase
         self::assertNull($freshMedia->getAlbum());
 
     }
-
 }
